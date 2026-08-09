@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from app.services.blog import load_articles
 
@@ -15,7 +15,7 @@ Sitemap: {sitemap_url}
 
 def sitemap_entries(base_url: str) -> list[tuple[str, str]]:
     """Retorna pares (caminho, lastmod ISO) para o sitemap, incluindo os artigos."""
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    today = datetime.now(UTC).strftime("%Y-%m-%d")
     entries: list[tuple[str, str]] = [(path, today) for path in SITEMAP_PATHS]
     for article in load_articles():
         entries.append((article.url, article.date))
@@ -24,7 +24,7 @@ def sitemap_entries(base_url: str) -> list[tuple[str, str]]:
 
 def build_sitemap(base_url: str, paths: list[str] | None = None) -> str:
     """Gera o sitemap.xml. Se `paths` for informado, ignora o blog."""
-    if paths is not None:
+    if paths is not None:  # noqa: SIM108
         entries = [(path, "") for path in paths]
     else:
         entries = sitemap_entries(base_url)

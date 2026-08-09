@@ -192,7 +192,6 @@ def test_reject_empty_file() -> None:
 
 def test_convert_legacy_doc(tmp_path: Path) -> None:
     """Conversão de .doc via LibreOffice (pula se o LibreOffice não estiver instalado)."""
-    import shutil
     import subprocess
 
     from app.services.libreoffice import LibreOfficeUnavailableError, _find_soffice

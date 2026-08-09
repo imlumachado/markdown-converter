@@ -1,15 +1,16 @@
 from __future__ import annotations
 
-import os
-import shutil
 from pathlib import Path
 
-import pymupdf
 import pytest
 
 from app.converters.docx import DocxConverter
 from app.converters.xlsx import XlsxConverter
-from app.services.libreoffice import LEGACY_TARGETS, LibreOfficeUnavailableError, _find_soffice
+from app.services.libreoffice import (
+    LEGACY_TARGETS,
+    LibreOfficeUnavailableError,
+    _find_soffice,
+)
 from app.services.magic import sniff_format
 
 

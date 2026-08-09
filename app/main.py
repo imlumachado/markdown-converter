@@ -19,7 +19,17 @@ from app.middleware import CacheControlMiddleware, RateLimitMiddleware
 from app.seo import ROBOTS_TXT, build_sitemap
 from app.services.blog import get_article, load_articles
 from app.services.concurrency import JobTracker
-from app.services.legal import CONTACT_CONTENT, CONTACT_DESCRIPTION, CONTACT_TITLE, PRIVACY_CONTENT, PRIVACY_DESCRIPTION, PRIVACY_TITLE, TERMS_CONTENT, TERMS_DESCRIPTION, TERMS_TITLE
+from app.services.legal import (
+    CONTACT_CONTENT,
+    CONTACT_DESCRIPTION,
+    CONTACT_TITLE,
+    PRIVACY_CONTENT,
+    PRIVACY_DESCRIPTION,
+    PRIVACY_TITLE,
+    TERMS_CONTENT,
+    TERMS_DESCRIPTION,
+    TERMS_TITLE,
+)
 
 app = FastAPI(
     title="Markdown Converter",
@@ -114,7 +124,11 @@ async def robots():
 async def ads():
     if not ADSENSE_CLIENT:
         return PlainTextResponse("# AdSense não configurado. Defina ADSENSE_CLIENT no ambiente.\n")
-    publisher = ADSENSE_CLIENT.replace("ca-", "pub-") if not ADSENSE_CLIENT.startswith("pub-") else ADSENSE_CLIENT
+    publisher = (
+        ADSENSE_CLIENT.replace("ca-", "pub-")
+        if not ADSENSE_CLIENT.startswith("pub-")
+        else ADSENSE_CLIENT
+    )
     return PlainTextResponse(f"google.com, {publisher}, DIRECT, f08c47fec0942fa0\n")
 
 

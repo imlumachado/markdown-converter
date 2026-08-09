@@ -1,0 +1,21 @@
+[tool.ruff]
+line-length = 110
+target-version = "py313"
+src = ["."]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "I", "UP", "SIM", "RUF", "FURB"]
+ignore = [
+    # FastAPI usa File(...) como default de rota (padrão da framework)
+    "B008",
+    # imports lazy intencionais (evita custo de import no worker)
+    "E402",
+    # testes usam imports dentro de funções para skip condicional
+    "PLC0415",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*.py" = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

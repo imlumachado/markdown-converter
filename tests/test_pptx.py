@@ -3,7 +3,6 @@ from __future__ import annotations
 from pathlib import Path
 
 from pptx import Presentation
-from pptx.util import Inches
 
 from app.converters.pptx import PptxConverter
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import app.services.blog as blog
+from app.services import blog
 
 
 def _article_text(slug: str, title: str, date: str) -> str:

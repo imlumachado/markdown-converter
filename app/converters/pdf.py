@@ -76,7 +76,11 @@ def _write_progress(progress_file: str | None, current: int, total: int) -> None
     if not progress_file:
         return
     try:
-        payload = {"current": current, "total": total, "percent": round(current / total * 100) if total else 0}
+        payload = {
+            "current": current,
+            "total": total,
+            "percent": round(current / total * 100) if total else 0,
+        }
         Path(progress_file).write_text(json.dumps(payload), encoding="utf-8")
     except OSError:
         pass

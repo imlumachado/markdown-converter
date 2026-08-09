@@ -65,6 +65,7 @@ def convert_to_modern(source: Path, out_dir: Path, fmt: str) -> Path:
         [soffice, "--headless", "--convert-to", target, "--outdir", str(out_dir), str(source)],
         capture_output=True,
         timeout=120,
+        check=False,
     )
     if proc.returncode != 0:
         raise LibreOfficeUnavailableError(

@@ -14,11 +14,11 @@ CONVERTERS: dict[str, BaseConverter] = {
 }
 
 __all__ = [
+    "CONVERTERS",
     "BaseConverter",
     "ConversionResult",
-    "CONVERTERS",
     "DocxConverter",
-    "XlsxConverter",
-    "PptxConverter",
     "PdfConverter",
+    "PptxConverter",
+    "XlsxConverter",
 ]

@@ -89,11 +89,12 @@ async def _run_conversion(source: Path) -> dict:
             cwd=PROJECT_ROOT,
             capture_output=True,
             env=env,
+            check=False,
         )
 
     try:
         proc = await asyncio.wait_for(asyncio.to_thread(_convert), timeout=CONVERSION_TIMEOUT_SECONDS)
-    except asyncio.TimeoutError as exc:
+    except TimeoutError as exc:
         raise HTTPException(status_code=408, detail="Tempo limite de conversão excedido.") from exc
 
     if proc.returncode != 0 or not result_json.exists():
@@ -137,7 +138,11 @@ async def _convert_background(
 
 
 @router.post("/convert")
-async def convert(file: UploadFile = File(...), background_tasks: BackgroundTasks = None, request: Request = None):
+async def convert(
+    file: UploadFile = File(...),
+    background_tasks: BackgroundTasks = None,
+    request: Request = None,
+):
     if background_tasks is None:
         background_tasks = BackgroundTasks()
 
@@ -153,7 +158,7 @@ async def convert(file: UploadFile = File(...), background_tasks: BackgroundTask
         try:
             validate_extension(file.filename or "")
         except ValueError as exc:
-            raise HTTPException(status_code=400, detail=str(exc))
+            raise HTTPException(status_code=400, detail=str(exc)) from None
 
         fmt = detect_format(file.filename)
         if fmt not in SUPPORTED_FORMATS:
@@ -171,7 +176,7 @@ async def convert(file: UploadFile = File(...), background_tasks: BackgroundTask
             validate_content(source, fmt)
         except ValueError as exc:
             cleanup_job(job_dir)
-            raise HTTPException(status_code=400, detail=str(exc))
+            raise HTTPException(status_code=400, detail=str(exc)) from None
 
         _write_status(job_dir, {"status": "processing"})
 

@@ -8,7 +8,7 @@ import markdown as md
 
 BLOG_DIR = Path("content/blog")
 
-_FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n?(.*)$", re.S)
+_FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n?(.*)$", re.DOTALL)
 _MD = md.Markdown(extensions=["tables", "fenced_code", "nl2br"])
 
 
@@ -44,7 +44,7 @@ def _parse(text: str) -> Article:
 
     html = _MD.reset().convert(body)
     return Article(
-        slug=meta["slug"] if "slug" in meta else "",
+        slug=meta.get("slug", ""),
         title=meta["title"],
         description=meta["description"],
         date=meta["date"],

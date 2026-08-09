@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 PRIVACY_TITLE = "Política de Privacidade"
-PRIVACY_DESCRIPTION = "Saiba como o Markdown Converter coleta, usa e protege seus dados, cookies e arquivos enviados."
+PRIVACY_DESCRIPTION = (
+    "Saiba como o Markdown Converter coleta, usa e protege seus dados, cookies e arquivos enviados."
+)
 PRIVACY_CONTENT = """\
 <p>Esta Política de Privacidade descreve como o Markdown Converter coleta, usa
 e protege as informações dos visitantes e usuários.</p>
@@ -34,7 +36,9 @@ momento pela página de <a href="/contact">contato</a>.</p>
 """
 
 TERMS_TITLE = "Termos de Uso"
-TERMS_DESCRIPTION = "Condições de uso do Markdown Converter: conversão gratuita, limites de arquivo e responsabilidades."
+TERMS_DESCRIPTION = (
+    "Condições de uso do Markdown Converter: conversão gratuita, limites de arquivo e responsabilidades."
+)
 TERMS_CONTENT = """\
 <p>Ao usar o Markdown Converter, você concorda com estes Termos de Uso.</p>
 
