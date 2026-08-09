@@ -1,13 +1,12 @@
 from __future__ import annotations
 
+import asyncio
 import json
-import subprocess
 import sys
 from pathlib import Path
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
-from app.converters import CONVERTERS
 from app.services.cleanup import cleanup_expired, cleanup_job
 from app.services.detector import detect_format
 from app.services.storage import create_job_dir, sanitize_filename
@@ -22,6 +21,8 @@ router = APIRouter(prefix="/api", tags=["conversion"])
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 CONVERSION_TIMEOUT_SECONDS = 120
 CHUNK_SIZE = 1024 * 1024  # 1 MB
+
+SUPPORTED_FORMATS = frozenset({"docx", "xlsx", "pptx", "pdf"})
 
 
 async def _read_upload(file: UploadFile) -> bytes:
@@ -42,26 +43,30 @@ async def _read_upload(file: UploadFile) -> bytes:
     return b"".join(chunks)
 
 
-def _run_conversion(source: Path) -> dict:
-    """Executa a conversão em subprocesso isolado com timeout."""
+async def _run_conversion(source: Path) -> dict:
+    """Executa a conversão em subprocesso isolado com timeout, sem bloquear o event loop."""
     result_json = source.parent / "result.json"
-    try:
-        proc = subprocess.run(
-            [
-                sys.executable,
-                "-m",
-                "app.services.convert_worker",
-                str(source),
-                str(result_json),
-            ],
+
+    async def _convert() -> tuple[str, str]:
+        proc = await asyncio.create_subprocess_exec(
+            sys.executable,
+            "-m",
+            "app.services.convert_worker",
+            str(source),
+            str(result_json),
             cwd=PROJECT_ROOT,
-            capture_output=True,
-            timeout=CONVERSION_TIMEOUT_SECONDS,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
         )
-    except subprocess.TimeoutExpired as exc:
+        stdout, stderr = await proc.communicate()
+        return stdout.decode(errors="replace"), stderr.decode(errors="replace")
+
+    try:
+        await asyncio.wait_for(_convert(), timeout=CONVERSION_TIMEOUT_SECONDS)
+    except asyncio.TimeoutError as exc:
         raise HTTPException(status_code=408, detail="Tempo limite de conversão excedido.") from exc
 
-    if proc.returncode != 0:
+    if not result_json.exists():
         raise HTTPException(status_code=500, detail="Falha ao converter o arquivo.")
 
     return json.loads(result_json.read_text(encoding="utf-8"))
@@ -75,7 +80,7 @@ async def convert(file: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail=str(exc))
 
     fmt = detect_format(file.filename)
-    if fmt not in CONVERTERS:
+    if fmt not in SUPPORTED_FORMATS:
         raise HTTPException(status_code=400, detail=f"Formato '{fmt}' ainda não é suportado.")
 
     content = await _read_upload(file)
@@ -93,7 +98,7 @@ async def convert(file: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail=str(exc))
 
     try:
-        data = _run_conversion(source)
+        data = await _run_conversion(source)
     except HTTPException:
         cleanup_job(job_dir)
         raise

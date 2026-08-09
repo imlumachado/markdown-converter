@@ -8,12 +8,35 @@ CPU/memória da API:
     python -m app.services.convert_worker <arquivo> <arquivo_saida_json>
 """
 
+import importlib
 import json
 import sys
 from pathlib import Path
 
-from app.converters import CONVERTERS
+from app.converters.base import BaseConverter
 from app.services.detector import detect_format
+
+CONVERTER_MODULES: dict[str, str] = {
+    "docx": "app.converters.docx",
+    "xlsx": "app.converters.xlsx",
+    "pptx": "app.converters.pptx",
+    "pdf": "app.converters.pdf",
+}
+
+
+def _get_converter(fmt: str) -> BaseConverter | None:
+    """Carrega apenas o conversor do formato, evitando imports pesados."""
+    module_name = CONVERTER_MODULES.get(fmt)
+    if module_name is None:
+        return None
+    module = importlib.import_module(module_name)
+    class_name = {
+        "docx": "DocxConverter",
+        "xlsx": "XlsxConverter",
+        "pptx": "PptxConverter",
+        "pdf": "PdfConverter",
+    }[fmt]
+    return getattr(module, class_name)()
 
 
 def main() -> int:
@@ -25,7 +48,7 @@ def main() -> int:
     output = Path(sys.argv[2])
     fmt = detect_format(source.name)
 
-    converter = CONVERTERS.get(fmt)
+    converter = _get_converter(fmt)
     if converter is None:
         print(f"Conversor não suportado: {fmt}", file=sys.stderr)
         return 3
