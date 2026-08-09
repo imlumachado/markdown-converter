@@ -60,7 +60,8 @@ Testes:
 |---|---|---|
 | 0 | Fundação (estrutura, git, ambiente, ADRs) | Concluída |
 | 1 | Motor via Streamlit | Concluída (4 formatos) |
-| 2 | Produto HTML/CSS/JS + FastAPI | Em andamento |
+| 2 | Produto HTML/CSS/JS + FastAPI | Concluída |
+| 3 | Segurança e confiabilidade | Concluída |
 | 3 | Segurança e confiabilidade | Pendente |
 | 4 | Publicação | Pendente |
 | 5 | SEO e conteúdo | Pendente |

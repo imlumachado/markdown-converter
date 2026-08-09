@@ -3,8 +3,12 @@ from __future__ import annotations
 from pathlib import Path
 
 from app.services.detector import SUPPORTED_EXTENSIONS
+from app.services.magic import sniff_format
 
 MAX_FILE_SIZE: int = 25 * 1024 * 1024  # 25 MB
+
+# Formatos com validação de conteúdo por magic bytes
+CONTENT_CHECKABLE: set[str] = {"docx", "xlsx", "pptx", "pdf"}
 
 
 class ValidationError(ValueError):
@@ -28,3 +32,19 @@ def validate_size(size: int) -> None:
     if size > MAX_FILE_SIZE:
         limit_mb = MAX_FILE_SIZE // (1024 * 1024)
         raise ValidationError(f"O arquivo excede o limite de {limit_mb} MB.")
+
+
+def validate_content(path: Path, expected_format: str) -> None:
+    """Valida que o conteúdo real do arquivo corresponde ao formato esperado."""
+    if expected_format not in CONTENT_CHECKABLE:
+        return
+    detected = sniff_format(path)
+    if detected is None:
+        raise ValidationError(
+            "O conteúdo do arquivo não corresponde a um formato suportado."
+        )
+    if detected != expected_format:
+        raise ValidationError(
+            f"Extensão '.{expected_format}' não corresponde ao conteúdo real "
+            f"do arquivo (detectado: .{detected})."
+        )
