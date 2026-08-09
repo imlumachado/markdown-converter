@@ -9,7 +9,9 @@ import pymupdf
 from app.converters.base import BaseConverter, ConversionResult
 
 OCR_LANGUAGE: str = os.getenv("OCR_LANGUAGE", "por").strip() or "por"
+OCR_LANGUAGE_FALLBACK: str = os.getenv("OCR_LANGUAGE_FALLBACK", "eng").strip() or "eng"
 OCR_DPI: int = int(os.getenv("OCR_DPI", "200"))
+OCR_ENABLED: bool = os.getenv("OCR_ENABLED", "true").strip().lower() in ("1", "true", "yes", "on")
 
 
 class PdfConverter(BaseConverter):
@@ -23,32 +25,47 @@ class PdfConverter(BaseConverter):
     def convert(self, source: Path, output_dir: Path) -> ConversionResult:
         doc = pymupdf.open(source)
         chunks: list[str] = []
-        ocr_pages = 0
+        ocr_pages: list[tuple[int, str]] = []
         total_pages = len(doc)
         progress_file = os.getenv("CONVERSION_PROGRESS_FILE")
         try:
             for index, page in enumerate(doc):
-                _write_progress(progress_file, index + 1, total_pages)
+                page_no = index + 1
+                _write_progress(progress_file, page_no, total_pages)
                 if _looks_like_table(page):
                     table = _extract_tables(page)
                     if table:
                         chunks.append(table)
+
                 text = page.get_text("text")
                 if text.strip():
-                    chunks.append(text.strip())
+                    if _has_images(page):
+                        # Camada parcial: extrai o texto digital e faz OCR apenas
+                        # das regiões com imagens (o PyMuPDF mescla ambos).
+                        merged, lang = _ocr_page(page, full=False)
+                        if merged:
+                            chunks.append(merged)
+                            ocr_pages.append((page_no, lang))
+                        else:
+                            chunks.append(text.strip())
+                    else:
+                        chunks.append(text.strip())
                 else:
-                    ocr_text = _ocr_page(page)
+                    ocr_text, lang = _ocr_page(page, full=True)
                     if ocr_text:
                         chunks.append(ocr_text)
-                        ocr_pages += 1
+                        ocr_pages.append((page_no, lang))
         finally:
             doc.close()
 
         warnings: list[str] = []
         if ocr_pages:
+            pages = sorted(p_no for p_no, _ in ocr_pages)
+            langs = "+".join(dict.fromkeys(lang for _, lang in ocr_pages))
             warnings.append(
-                f"{ocr_pages} página(s) digitalizada(s) processada(s) via OCR "
-                f"(idioma '{OCR_LANGUAGE}'). A precisão pode variar."
+                f"{len(pages)} página(s) processada(s) via OCR "
+                f"(página(s) {_fmt_pages(pages)}, idioma '{langs or OCR_LANGUAGE}'). "
+                "A precisão pode variar."
             )
 
         return ConversionResult(markdown="\n\n".join(chunks).strip(), warnings=warnings)
@@ -65,18 +82,61 @@ def _write_progress(progress_file: str | None, current: int, total: int) -> None
         pass
 
 
-def _ocr_page(page: pymupdf.Page) -> str:
-    """Extrai texto de uma página digitalizada usando OCR (Tesseract)."""
-    try:
-        textpage = page.get_textpage_ocr(
-            language=OCR_LANGUAGE,
-            full=True,
-            dpi=OCR_DPI,
-        )
-        return (textpage.extractText() or "").strip()
-    except RuntimeError:
+def _ocr_page(page: pymupdf.Page, full: bool = True) -> tuple[str, str]:
+    """Extrai texto de uma página usando OCR (Tesseract), com fallback de idioma.
+
+    Retorna o texto OCR e o idioma efetivamente usado ("" se não houver Tesseract
+    nem idioma disponível).
+    """
+    if not OCR_ENABLED:
+        return "", ""
+    last_error: RuntimeError | None = None
+    for lang in _ocr_languages():
+        try:
+            textpage = page.get_textpage_ocr(
+                language=lang,
+                full=full,
+                dpi=OCR_DPI,
+            )
+            text = (textpage.extractText() or "").strip()
+            if text:
+                return text, lang
+        except RuntimeError as exc:
+            last_error = exc
+    if last_error is not None:
         # Tesseract não instalado ou idioma indisponível
+        return "", ""
+    return "", ""
+
+
+def _ocr_languages() -> list[str]:
+    """Lista de idiomas a tentar, sem duplicatas, na ordem de preferência."""
+    langs: list[str] = []
+    for lang in (OCR_LANGUAGE, OCR_LANGUAGE_FALLBACK):
+        if lang and lang not in langs:
+            langs.append(lang)
+    return langs or ["eng"]
+
+
+def _has_images(page: pymupdf.Page) -> bool:
+    """Indica se a página contém imagens embutidas (candidatas a OCR parcial)."""
+    return bool(page.get_images(full=True))
+
+
+def _fmt_pages(pages: list[int]) -> str:
+    """Formata números de página compactando intervalos (ex.: '2, 5-7')."""
+    if not pages:
         return ""
+    parts: list[str] = []
+    start = prev = pages[0]
+    for p in pages[1:]:
+        if p == prev + 1:
+            prev = p
+            continue
+        parts.append(str(start) if start == prev else f"{start}-{prev}")
+        start = prev = p
+    parts.append(str(start) if start == prev else f"{start}-{prev}")
+    return ", ".join(parts)
 
 
 def _looks_like_table(page: pymupdf.Page, max_words: int = 400) -> bool:

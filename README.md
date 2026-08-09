@@ -81,4 +81,11 @@ Veja o guia completo em [DEPLOY.md](DEPLOY.md). Resumo:
 - **OCR para PDFs digitalizados:** páginas sem camada de texto são processadas via
   Tesseract (`OCR_LANGUAGE`, padrão `por`). Requer o binário `tesseract` no ambiente
   (instalado no Dockerfile).
-- Variáveis: `OCR_LANGUAGE`, `OCR_DPI`, `CONVERSION_TIMEOUT_SECONDS` (veja `.env.example`).
+- **Fallback de idioma:** se `OCR_LANGUAGE` falhar (idioma não instalado), tenta
+  `OCR_LANGUAGE_FALLBACK` (padrão `eng`) automaticamente.
+- **Camada parcial:** páginas com texto e imagens fazem OCR apenas das regiões sem
+  texto (via `full=False` do PyMuPDF), mesclando o texto digital com o OCR.
+- **Aviso detalhado:** a conversão informa quais páginas passaram por OCR e o idioma
+  usado (ex.: "página(s) 2, 5-7, idioma 'por'").
+- Variáveis: `OCR_LANGUAGE`, `OCR_LANGUAGE_FALLBACK`, `OCR_DPI`, `OCR_ENABLED`,
+  `CONVERSION_TIMEOUT_SECONDS` (veja `.env.example`).

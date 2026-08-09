@@ -47,7 +47,7 @@ Backup consolidado do conteúdo criado até o momento. Cada etapa registra o que
 
 ## Status dos testes
 
-- 20 testes passando (`pytest tests -q` com Tesseract no PATH)
+- 23 testes passando (`pytest tests -q` com Tesseract no PATH)
 
 ## Como restaurar
 

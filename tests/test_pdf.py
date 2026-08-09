@@ -91,5 +91,70 @@ def test_ocr_page_graceful_without_tesseract(monkeypatch) -> None:
     monkeypatch.setattr(pdf_module, "OCR_LANGUAGE", "por")
     monkeypatch.setattr(page, "get_textpage_ocr", _raise)
 
-    assert pdf_module._ocr_page(page) == ""
+    text, lang = pdf_module._ocr_page(page)
+    assert text == ""
+    assert lang == ""
     doc.close()
+
+
+def test_ocr_page_language_fallback(monkeypatch) -> None:
+    """Se o idioma principal falha, tenta o fallback (eng) automaticamente."""
+    import pymupdf as mupdf
+
+    doc = mupdf.open()
+    page = doc.new_page()
+
+    import app.converters.pdf as pdf_module
+
+    calls: list[str] = []
+
+    class _FakeTextPage:
+        def extractText(self) -> str:
+            return "resultado do OCR"
+
+    def _fake_ocr(*, language, full, dpi):
+        calls.append(language)
+        if language == "por":
+            raise RuntimeError("language 'por' not found")
+        return _FakeTextPage()
+
+    monkeypatch.setattr(pdf_module, "OCR_LANGUAGE", "por")
+    monkeypatch.setattr(pdf_module, "OCR_LANGUAGE_FALLBACK", "eng")
+    monkeypatch.setattr(page, "get_textpage_ocr", _fake_ocr)
+
+    text, lang = pdf_module._ocr_page(page)
+    assert calls == ["por", "eng"]
+    assert text == "resultado do OCR"
+    assert lang == "eng"
+    doc.close()
+
+
+def test_ocr_disabled(monkeypatch) -> None:
+    """Com OCR_ENABLED=false, _ocr_page não chama o Tesseract."""
+    import pymupdf as mupdf
+
+    doc = mupdf.open()
+    page = doc.new_page()
+
+    import app.converters.pdf as pdf_module
+
+    monkeypatch.setattr(pdf_module, "OCR_ENABLED", False)
+
+    def _should_not_call(**kwargs):
+        raise AssertionError("OCR não deveria ser executado")
+
+    monkeypatch.setattr(page, "get_textpage_ocr", _should_not_call)
+
+    text, lang = pdf_module._ocr_page(page)
+    assert text == ""
+    assert lang == ""
+    doc.close()
+
+
+def test_fmt_pages() -> None:
+    import app.converters.pdf as pdf_module
+
+    assert pdf_module._fmt_pages([]) == ""
+    assert pdf_module._fmt_pages([1]) == "1"
+    assert pdf_module._fmt_pages([1, 2, 3]) == "1-3"
+    assert pdf_module._fmt_pages([2, 5, 6, 7, 9]) == "2, 5-7, 9"
