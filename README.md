@@ -39,6 +39,15 @@ pip install -r requirements.txt
 streamlit run app/prototype.py
 ```
 
+## Como rodar o produto (Fase 2)
+
+```bash
+.venv\Scripts\activate
+uvicorn app.main:app --reload
+```
+
+Acesse http://localhost:8000
+
 Testes:
 
 ```bash
@@ -50,8 +59,8 @@ Testes:
 | Fase | Descrição | Status |
 |---|---|---|
 | 0 | Fundação (estrutura, git, ambiente, ADRs) | Concluída |
-| 1 | Motor via Streamlit | Em andamento (4 formatos funcionais) |
-| 2 | Produto HTML/CSS/JS + FastAPI | Pendente |
+| 1 | Motor via Streamlit | Concluída (4 formatos) |
+| 2 | Produto HTML/CSS/JS + FastAPI | Em andamento |
 | 3 | Segurança e confiabilidade | Pendente |
 | 4 | Publicação | Pendente |
 | 5 | SEO e conteúdo | Pendente |

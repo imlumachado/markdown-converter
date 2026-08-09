@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conversor de Arquivos para Markdown | DOCX, XLSX, PPTX e PDF para .md</title>
+  <meta name="description" content="Converta Word, Excel, PowerPoint e PDF para Markdown (.md) gratuitamente. Sem cadastro, preview imediato e download do arquivo. Seus arquivos são excluídos após a conversão.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="/">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
+  <script src="/static/js/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">Markdown<span>Converter</span></a>
+      <nav class="main-nav">
+        <a href="/#tool">Ferramenta</a>
+        <a href="/#how-it-works">Como funciona</a>
+        <a href="/#formats">Formatos</a>
+        <a href="/#faq">FAQ</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <h1>Converta Word, Excel, PowerPoint e PDF para Markdown</h1>
+        <p class="subtitle">Arraste seu arquivo, veja o preview e baixe o .md. Sem cadastro, sem custo. Os arquivos são processados temporariamente e excluídos após a conversão.</p>
+
+        <div id="tool" class="tool-card">
+          <div id="drop-zone" class="drop-zone" role="button" tabindex="0" aria-label="Enviar arquivo">
+            <input type="file" id="file-input" accept=".docx,.xlsx,.pptx,.pdf" hidden>
+            <div class="drop-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 16V4m0 0l-4 4m4-4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <p class="drop-title">Arraste seu arquivo aqui</p>
+            <p class="drop-hint">ou <span>clique para escolher</span> (DOCX, XLSX, PPTX ou PDF)</p>
+          </div>
+
+          <div id="progress-wrap" class="progress-wrap" hidden>
+            <div class="progress-track"><div id="progress-bar" class="progress-bar"></div></div>
+            <p id="progress-text" class="progress-text">Enviando arquivo...</p>
+          </div>
+
+          <div id="error-box" class="error-box" hidden></div>
+
+          <div id="result-box" class="result-box" hidden>
+            <div class="result-header">
+              <h2>Resultado</h2>
+              <button id="download-btn" class="btn btn-primary" type="button">Baixar .md</button>
+            </div>
+            <div class="result-body">
+              <div id="preview" class="preview"></div>
+            </div>
+            <div class="result-actions">
+              <button id="new-conversion-btn" class="btn btn-secondary" type="button">Nova conversão</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="how-it-works" class="section">
+      <div class="container">
+        <h2>Como funciona</h2>
+        <ol class="steps">
+          <li><strong>Envie o arquivo</strong> — arraste e solte ou clique para escolher.</li>
+          <li><strong>Converta</strong> — o conteúdo é convertido preservando a estrutura.</li>
+          <li><strong>Revise o preview</strong> — confira o Markdown antes de baixar.</li>
+          <li><strong>Baixe o .md</strong> — e seus arquivos temporários são excluídos.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="formats" class="section section-alt">
+      <div class="container">
+        <h2>Formatos suportados</h2>
+        <div class="formats-grid">
+          <article class="format-card">
+            <h3>Word → Markdown</h3>
+            <p>DOCX com títulos, listas, tabelas, links e imagens.</p>
+          </article>
+          <article class="format-card">
+            <h3>Excel → Markdown</h3>
+            <p>XLSX com planilhas convertidas em tabelas markdown.</p>
+          </article>
+          <article class="format-card">
+            <h3>PowerPoint → Markdown</h3>
+            <p>PPTX com títulos e conteúdo de cada slide.</p>
+          </article>
+          <article class="format-card">
+            <h3>PDF → Markdown</h3>
+            <p>PDF com texto extraído de forma limpa.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" class="section">
+      <div class="container">
+        <h2>Perguntas frequentes</h2>
+        <details>
+          <summary>Meus arquivos ficam armazenados?</summary>
+          <p>Não. Os arquivos são processados temporariamente e excluídos logo após a conversão.</p>
+        </details>
+        <details>
+          <summary>Preciso criar uma conta?</summary>
+          <p>Não. A conversão é gratuita e não exige cadastro.</p>
+        </details>
+        <details>
+          <summary>Qual o tamanho máximo do arquivo?</summary>
+          <p>O limite é de 25 MB por arquivo.</p>
+        </details>
+        <details>
+          <summary>Os formatos .doc, .xls e .ppt são suportados?</summary>
+          <p>No momento aceitamos .docx, .xlsx, .pptx e .pdf.</p>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 Markdown Converter. Todos os direitos reservados.</p>
+      <nav>
+        <a href="/privacy">Política de Privacidade</a>
+        <a href="/terms">Termos de Uso</a>
+        <a href="/contact">Contato</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>
