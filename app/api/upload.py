@@ -20,7 +20,7 @@ from app.services.validator import (
 router = APIRouter(prefix="/api", tags=["conversion"])
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-CONVERSION_TIMEOUT_SECONDS = 30
+CONVERSION_TIMEOUT_SECONDS = 120
 CHUNK_SIZE = 1024 * 1024  # 1 MB
 
 
