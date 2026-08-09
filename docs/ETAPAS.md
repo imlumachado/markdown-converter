@@ -55,9 +55,19 @@ Backup consolidado do conteúdo criado até o momento. Cada etapa registra o que
 - **SEO on-page:** meta description, canônico e h1 por rota.
 - 4 artigos iniciais publicados.
 
+## Etapa 6 — Monetização (em andamento)
+
+- **Páginas legais + contato:** `/privacy`, `/terms` e `/contact` (obrigatórias
+  para aprovação no AdSense).
+- **Injeção de anúncios:** slot responsivo via env (`ADSENSE_ENABLED`,
+  `ADSENSE_CLIENT`, `ADSENSE_SLOT`); só carrega com consentimento de cookies.
+- **Banner de cookies:** consentimento LGPD/GDPR em `localStorage`; anúncios
+  personalizados só após "Aceitar todos".
+- **ads.txt** servido dinamicamente com o publisher ID.
+
 ## Status dos testes
 
-- 31 testes passando (`pytest tests -q` com Tesseract no PATH)
+- 36 testes passando (`pytest tests -q` com Tesseract no PATH)
 
 ## Como restaurar
 

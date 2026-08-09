@@ -6,10 +6,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from app.api import download, upload
-from app.config import BASE_URL, GA_ID
+from app.config import ADSENSE_CLIENT, ADSENSE_ENABLED, ADSENSE_SLOT, BASE_URL, GA_ID
 from app.middleware import RateLimitMiddleware
 from app.seo import ROBOTS_TXT, build_sitemap
 from app.services.blog import get_article, load_articles
+from app.services.legal import CONTACT_CONTENT, CONTACT_DESCRIPTION, CONTACT_TITLE, PRIVACY_CONTENT, PRIVACY_DESCRIPTION, PRIVACY_TITLE, TERMS_CONTENT, TERMS_DESCRIPTION, TERMS_TITLE
 
 app = FastAPI(
     title="Markdown Converter",
@@ -31,7 +32,13 @@ async def index(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="index.html",
-        context={"ga_id": GA_ID, "base_url": BASE_URL},
+        context={
+            "ga_id": GA_ID,
+            "base_url": BASE_URL,
+            "adsense_enabled": ADSENSE_ENABLED,
+            "adsense_client": ADSENSE_CLIENT,
+            "adsense_slot": ADSENSE_SLOT,
+        },
     )
 
 
@@ -56,9 +63,47 @@ async def blog_article(request: Request, slug: str):
     )
 
 
+def _page(request: Request, title: str, description: str, content: str, url: str):
+    return templates.TemplateResponse(
+        request=request,
+        name="page.html",
+        context={
+            "ga_id": GA_ID,
+            "base_url": BASE_URL,
+            "page_title": title,
+            "page_description": description,
+            "page_url": url,
+            "content": content,
+        },
+    )
+
+
+@app.get("/privacy", response_class=HTMLResponse)
+async def privacy(request: Request):
+    return _page(request, PRIVACY_TITLE, PRIVACY_DESCRIPTION, PRIVACY_CONTENT, "/privacy")
+
+
+@app.get("/terms", response_class=HTMLResponse)
+async def terms(request: Request):
+    return _page(request, TERMS_TITLE, TERMS_DESCRIPTION, TERMS_CONTENT, "/terms")
+
+
+@app.get("/contact", response_class=HTMLResponse)
+async def contact(request: Request):
+    return _page(request, CONTACT_TITLE, CONTACT_DESCRIPTION, CONTACT_CONTENT, "/contact")
+
+
 @app.get("/robots.txt", response_class=PlainTextResponse, include_in_schema=False)
 async def robots():
     return PlainTextResponse(ROBOTS_TXT.format(sitemap_url=f"{BASE_URL}/sitemap.xml"))
+
+
+@app.get("/ads.txt", response_class=PlainTextResponse, include_in_schema=False)
+async def ads():
+    if not ADSENSE_CLIENT:
+        return PlainTextResponse("# AdSense não configurado. Defina ADSENSE_CLIENT no ambiente.\n")
+    publisher = ADSENSE_CLIENT.replace("ca-", "pub-") if not ADSENSE_CLIENT.startswith("pub-") else ADSENSE_CLIENT
+    return PlainTextResponse(f"google.com, {publisher}, DIRECT, f08c47fec0942fa0\n")
 
 
 @app.get("/sitemap.xml", response_class=Response, include_in_schema=False)

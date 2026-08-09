@@ -194,5 +194,31 @@
       </nav>
     </div>
   </footer>
+
+  {% if adsense_enabled %}
+  <div class="ad-slot" id="ad-slot" data-client="{{ adsense_client }}" data-slot="{{ adsense_slot }}" hidden>
+    <ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="{{ adsense_client }}"
+      data-ad-slot="{{ adsense_slot }}"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>
+  </div>
+  {% endif %}
+
+  <div class="cookie-banner" id="cookie-banner" role="dialog" aria-label="Consentimento de cookies">
+    <p>Este site usa cookies para melhorar sua experiência e, com seu consentimento,
+      para exibir anúncios personalizados do Google. Saiba mais na nossa
+      <a href="/privacy">Política de Privacidade</a>.</p>
+    <div class="cookie-actions">
+      <button class="btn btn-primary" id="cookie-accept" type="button">Aceitar todos</button>
+      <button class="btn btn-secondary" id="cookie-decline" type="button">Somente essenciais</button>
+    </div>
+  </div>
+
+  <script src="/static/js/cookies.js" defer></script>
+  {% if adsense_enabled %}
+  <script src="/static/js/ads.js" defer></script>
+  {% endif %}
 </body>
 </html>

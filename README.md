@@ -71,7 +71,7 @@ Veja o guia completo em [DEPLOY.md](DEPLOY.md). Resumo:
 | 3 | Segurança e confiabilidade | Concluída |
 | 4 | Publicação | Pausada (testes locais em andamento) |
 | 5 | SEO e conteúdo | Em andamento (blog, sitemap dinâmico, rich snippets) |
-| 6 | Monetização (AdSense) | Pendente |
+| 6 | Monetização (AdSense) | Em andamento (páginas legais, banner cookies, ads.txt) |
 | 7 | Escalabilidade | Pendente |
 
 ## Conversão assíncrona e OCR

@@ -80,6 +80,38 @@ def test_blog_article_not_found() -> None:
     assert response.status_code == 404
 
 
+def test_privacy_page() -> None:
+    response = client.get("/privacy")
+    assert response.status_code == 200
+    assert "Política de Privacidade" in response.text
+    assert "cookies" in response.text.lower()
+
+
+def test_terms_page() -> None:
+    response = client.get("/terms")
+    assert response.status_code == 200
+    assert "Termos de Uso" in response.text
+
+
+def test_contact_page() -> None:
+    response = client.get("/contact")
+    assert response.status_code == 200
+    assert "Contato" in response.text
+
+
+def test_ads_txt_default() -> None:
+    response = client.get("/ads.txt")
+    assert response.status_code == 200
+    assert "AdSense não configurado" in response.text
+
+
+def test_cookie_banner_present() -> None:
+    response = client.get("/")
+    assert response.status_code == 200
+    assert "cookie-banner" in response.text
+    assert "cookie-accept" in response.text
+
+
 def test_convert_and_download(tmp_path: Path) -> None:
     source = tmp_path / "api.docx"
     _make_docx(source)
