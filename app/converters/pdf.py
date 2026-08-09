@@ -19,9 +19,10 @@ class PdfConverter(BaseConverter):
         chunks: list[str] = []
         try:
             for page in doc:
-                table = _extract_tables(page)
-                if table:
-                    chunks.append(table)
+                if _looks_like_table(page):
+                    table = _extract_tables(page)
+                    if table:
+                        chunks.append(table)
                 text = page.get_text("text")
                 if text.strip():
                     chunks.append(text.strip())
@@ -29,6 +30,35 @@ class PdfConverter(BaseConverter):
             doc.close()
 
         return ConversionResult(markdown="\n\n".join(chunks).strip())
+
+
+def _looks_like_table(page: pymupdf.Page, max_words: int = 400) -> bool:
+    """Heurística barata para evitar `find_tables()` em páginas de prosa.
+
+    Páginas de texto denso tornam o `find_tables()` (análise de layout O(n²))
+    muito lento em PDFs grandes. Só rodamos a extração de tabelas quando as
+    palavras da página estão alinhadas em 2+ colunas consistentes.
+    """
+    words = page.get_text("words")
+    if not words or len(words) > max_words:
+        return False
+
+    rows: dict[int, list[object]] = {}
+    for word in words:
+        key = round(word[3] / 8)  # y1/8 agrupa linhas próximas
+        rows.setdefault(key, []).append(word)
+
+    column_rows = 0
+    for ws in rows.values():
+        x0s = sorted({round(w[0]) for w in ws})
+        cols = 1
+        for i in range(1, len(x0s)):
+            if x0s[i] - x0s[i - 1] > 50:
+                cols += 1
+        if cols >= 2:
+            column_rows += 1
+
+    return bool(rows) and column_rows / len(rows) >= 0.5
 
 
 def _extract_tables(page: pymupdf.Page) -> str:
