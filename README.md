@@ -32,12 +32,25 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
+## Como rodar o protótipo (Fase 1)
+
+```bash
+.venv\Scripts\activate
+streamlit run app/prototype.py
+```
+
+Testes:
+
+```bash
+.venv\Scripts\python.exe -m pytest tests -q
+```
+
 ## Fases
 
 | Fase | Descrição | Status |
 |---|---|---|
-| 0 | Fundação (estrutura, git, ambiente, ADRs) | Em andamento |
-| 1 | Motor via Streamlit | Pendente |
+| 0 | Fundação (estrutura, git, ambiente, ADRs) | Concluída |
+| 1 | Motor via Streamlit | Em andamento (4 formatos funcionais) |
 | 2 | Produto HTML/CSS/JS + FastAPI | Pendente |
 | 3 | Segurança e confiabilidade | Pendente |
 | 4 | Publicação | Pendente |
