@@ -53,7 +53,7 @@ Backup consolidado do conteúdo criado até o momento. Cada etapa registra o que
 - **Rich snippets:** Open Graph/Twitter Cards + JSON-LD (`WebApplication`,
   `FAQPage` na home, `BreadcrumbList` nos artigos).
 - **SEO on-page:** meta description, canônico e h1 por rota.
-- 4 artigos iniciais publicados.
+- 7 artigos publicados (4 formatos + privacidade, comparativo e guia de sintaxe).
 
 ## Etapa 6 — Monetização (em andamento)
 
