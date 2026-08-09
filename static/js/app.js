@@ -58,12 +58,11 @@
 
     xhr.onload = function () {
       if (xhr.status === 200) {
-        setProgress(1, "Convertendo...");
+        setProgress(0.05, "Enviado. Iniciando conversão...");
         const data = JSON.parse(xhr.responseText);
-        downloadUrl = data.download_url;
-        renderResult(data.markdown);
+        pollStatus(data.status_url);
       } else {
-        let detail = "Não foi possível converter o arquivo.";
+        let detail = "Não foi possível enviar o arquivo.";
         try {
           const data = JSON.parse(xhr.responseText);
           if (data.detail) detail = data.detail;
@@ -88,12 +87,50 @@
     xhr.send(formData);
   }
 
-  function renderResult(markdown) {
+  function pollStatus(statusUrl) {
+    const poll = function () {
+      fetch(statusUrl)
+        .then(function (response) {
+          if (!response.ok) throw new Error("status");
+          return response.json();
+        })
+        .then(function (data) {
+          if (data.status === "processing") {
+            const p = data.progress;
+            if (p && p.total) {
+              setProgress(p.current / p.total, "Convertendo página " + p.current + " de " + p.total + "...");
+            } else {
+              setProgress(0.2, "Convertendo... PDF digitalizado pode levar mais tempo.");
+            }
+            setTimeout(poll, 1500);
+          } else if (data.status === "done") {
+            downloadUrl = data.download_url;
+            renderResult(data.markdown, data.warnings);
+          } else {
+            progressWrap.hidden = true;
+            showError(data.detail || "Não foi possível converter o arquivo.");
+          }
+        })
+        .catch(function () {
+          progressWrap.hidden = true;
+          showError("Erro ao consultar o status da conversão.");
+        });
+    };
+    poll();
+  }
+
+  function renderResult(markdown, warnings) {
     progressWrap.hidden = true;
     if (window.marked) {
       preview.innerHTML = marked.parse(markdown);
     } else {
       preview.textContent = markdown;
+    }
+    if (warnings && warnings.length) {
+      const box = document.createElement("div");
+      box.className = "warning-box";
+      box.textContent = warnings.join(" ");
+      resultBox.insertBefore(box, resultBox.firstChild);
     }
     resultBox.hidden = false;
   }

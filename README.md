@@ -76,3 +76,12 @@ Veja o guia completo em [DEPLOY.md](DEPLOY.md). Resumo:
 | 5 | SEO e conteúdo | Pendente |
 | 6 | Monetização (AdSense) | Pendente |
 | 7 | Escalabilidade | Pendente |
+
+## Conversão assíncrona e OCR
+
+- **Fluxo assíncrono:** `POST /api/convert` retorna `task_id` e `status_url` na hora; o
+  progresso é consultado em `GET /api/status/{task_id}` (polling pelo frontend).
+- **OCR para PDFs digitalizados:** páginas sem camada de texto são processadas via
+  Tesseract (`OCR_LANGUAGE`, padrão `por`). Requer o binário `tesseract` no ambiente
+  (instalado no Dockerfile).
+- Variáveis: `OCR_LANGUAGE`, `OCR_DPI`, `CONVERSION_TIMEOUT_SECONDS` (veja `.env.example`).

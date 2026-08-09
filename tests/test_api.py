@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from pathlib import Path
 
 from docx import Document
@@ -16,6 +17,19 @@ def _make_docx(path: Path) -> None:
     doc.add_heading("API Teste", level=1)
     doc.add_paragraph("Conteúdo da API.")
     doc.save(str(path))
+
+
+def _wait_done(task_id: str, timeout: float = 30.0) -> dict:
+    """Polling do status até a conversão terminar."""
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        response = client.get(f"/api/status/{task_id}")
+        assert response.status_code == 200
+        data = response.json()
+        if data["status"] in ("done", "error"):
+            return data
+        time.sleep(0.2)
+    raise AssertionError("Conversão não terminou a tempo")
 
 
 def test_health() -> None:
@@ -56,12 +70,19 @@ def test_convert_and_download(tmp_path: Path) -> None:
 
     assert response.status_code == 200
     data = response.json()
+    assert data["status"] == "processing"
     assert data["filename"].endswith(".md")
-    assert "# API Teste" in data["markdown"]
+    assert data["status_url"] == f"/api/status/{data['task_id']}"
     assert data["download_url"] == f"/api/download/{data['task_id']}"
 
     job_dir = TEMP_ROOT / data["task_id"]
     assert job_dir.is_dir()
+
+    status = _wait_done(data["task_id"])
+    assert status["status"] == "done"
+    assert status["filename"].endswith(".md")
+    assert "# API Teste" in status["markdown"]
+    assert status["download_url"] == f"/api/download/{data['task_id']}"
 
     download = client.get(f"/api/download/{data['task_id']}")
     assert download.status_code == 200
@@ -72,6 +93,11 @@ def test_convert_and_download(tmp_path: Path) -> None:
 
 def test_convert_unknown_task() -> None:
     response = client.get("/api/download/inexistente")
+    assert response.status_code == 404
+
+
+def test_status_unknown_task() -> None:
+    response = client.get("/api/status/inexistente")
     assert response.status_code == 404
 
 
