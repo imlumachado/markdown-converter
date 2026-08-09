@@ -30,6 +30,20 @@ def test_index_page() -> None:
     assert "Conversor de Arquivos para Markdown" in response.text
 
 
+def test_robots_txt() -> None:
+    response = client.get("/robots.txt")
+    assert response.status_code == 200
+    assert "User-agent: *" in response.text
+    assert "/sitemap.xml" in response.text
+
+
+def test_sitemap_xml() -> None:
+    response = client.get("/sitemap.xml")
+    assert response.status_code == 200
+    assert "urlset" in response.text
+    assert "<loc>" in response.text
+
+
 def test_convert_and_download(tmp_path: Path) -> None:
     source = tmp_path / "api.docx"
     _make_docx(source)

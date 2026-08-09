@@ -1,0 +1,57 @@
+# Etapas do Projeto — Markdown Converter
+
+Backup consolidado do conteúdo criado até o momento. Cada etapa registra o que foi entregue.
+
+## Etapa 0 — Fundação (concluída)
+
+- Estrutura de diretórios (`app/`, `converters/`, `services/`, `api/`, `tests/`, `temp/`, `docs/`)
+- Repositório Git inicializado
+- Ambiente virtual + `requirements.txt` (markitdown, python-docx, openpyxl, python-pptx, PyMuPDF, Pillow, streamlit, fastapi, pytest)
+- `.gitignore`, `README.md`
+- ADRs: Streamlit→FastAPI, MarkItDown como motor, armazenamento temporário
+
+## Etapa 1 — Motor de conversão (concluída)
+
+- Interface `BaseConverter` / `ConversionResult`
+- Conversores DOCX, XLSX, PPTX e PDF via MarkItDown
+- `detector.py` (detecção por extensão) e `validator.py` (extensão/tamanho)
+- Protótipo Streamlit (`app/prototype.py`): upload, preview, download
+- Testes unitários por formato
+
+## Etapa 2 — Produto HTML/CSS/JS + FastAPI (concluída)
+
+- API FastAPI: `POST /api/convert` e `GET /api/download/{task_id}`
+- `storage.py` (UUID, nomes sanitizados) e `cleanup.py` (TTL 30 min)
+- Frontend: drag & drop, barra de progresso, preview markdown, download
+- Exclusão automática do diretório temporário após o download
+- Testes da API
+
+## Etapa 3 — Segurança e confiabilidade (concluída)
+
+- `magic.py`: validação de conteúdo por magic bytes (rejeita extensão mascarada)
+- `convert_worker.py`: conversão isolada em subprocesso com timeout de 30s
+- `middleware.py`: rate limiting por IP (10 req/min)
+- Leitura do upload em blocos (413 acima do limite)
+- Testes de segurança
+
+## Etapa 4 — Publicação (preparação de deploy concluída)
+
+- `config.py` (BASE_URL, GA_ID, PORT via env)
+- `seo.py` + rotas `/robots.txt` e `/sitemap.xml`
+- Google Analytics 4 (opcional via env)
+- `Dockerfile`, `.dockerignore`, `docker-compose.yml`
+- `render.yaml`, `.env.example`, `DEPLOY.md`
+
+## Status dos testes
+
+- 17 testes passando (`pytest tests -q`)
+
+## Como restaurar
+
+O backup completo do código está na pasta `projeto/` dentro desta pasta. Para restaurar, copie o conteúdo de `projeto/` para o local desejado e execute:
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+```
