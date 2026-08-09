@@ -112,6 +112,25 @@ def test_cookie_banner_present() -> None:
     assert "cookie-accept" in response.text
 
 
+def test_static_cache_headers() -> None:
+    response = client.get("/static/css/style.css")
+    assert response.status_code == 200
+    assert "max-age=3600" in response.headers.get("Cache-Control", "")
+
+
+def test_dynamic_pages_no_cache() -> None:
+    for path in ("/", "/blog"):
+        response = client.get(path)
+        assert response.status_code == 200
+        assert response.headers.get("Cache-Control") == "no-cache"
+
+
+def test_sitemap_xml_no_cache() -> None:
+    response = client.get("/sitemap.xml")
+    assert response.status_code == 200
+    assert response.headers.get("Cache-Control") == "no-cache"
+
+
 def test_convert_and_download(tmp_path: Path) -> None:
     source = tmp_path / "api.docx"
     _make_docx(source)

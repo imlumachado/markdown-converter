@@ -6,10 +6,19 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from app.api import download, upload
-from app.config import ADSENSE_CLIENT, ADSENSE_ENABLED, ADSENSE_SLOT, BASE_URL, GA_ID
-from app.middleware import RateLimitMiddleware
+from app.config import (
+    ADSENSE_CLIENT,
+    ADSENSE_ENABLED,
+    ADSENSE_SLOT,
+    BASE_URL,
+    GA_ID,
+    MAX_CONCURRENT_JOBS,
+    MAX_JOBS_PER_IP,
+)
+from app.middleware import CacheControlMiddleware, RateLimitMiddleware
 from app.seo import ROBOTS_TXT, build_sitemap
 from app.services.blog import get_article, load_articles
+from app.services.concurrency import JobTracker
 from app.services.legal import CONTACT_CONTENT, CONTACT_DESCRIPTION, CONTACT_TITLE, PRIVACY_CONTENT, PRIVACY_DESCRIPTION, PRIVACY_TITLE, TERMS_CONTENT, TERMS_DESCRIPTION, TERMS_TITLE
 
 app = FastAPI(
@@ -18,6 +27,9 @@ app = FastAPI(
     version="0.1.0",
 )
 
+app.state.job_tracker = JobTracker(MAX_CONCURRENT_JOBS, MAX_JOBS_PER_IP)
+
+app.add_middleware(CacheControlMiddleware)
 app.add_middleware(RateLimitMiddleware, max_requests=10, window_seconds=60)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")

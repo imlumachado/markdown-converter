@@ -65,9 +65,17 @@ Backup consolidado do conteúdo criado até o momento. Cada etapa registra o que
   personalizados só após "Aceitar todos".
 - **ads.txt** servido dinamicamente com o publisher ID.
 
+## Etapa 7 — Escalabilidade (em andamento)
+
+- **Limite de concorrência:** `JobTracker` com semáforo global
+  (`MAX_CONCURRENT_JOBS`) e por IP (`MAX_JOBS_PER_IP`); excedeu retorna HTTP 429.
+  O slot é liberado no `finally` do background task e em todos os caminhos de erro.
+- **Caching HTTP:** `CacheControlMiddleware` — `/static/*` com `max-age=3600`,
+  demais rotas com `no-cache` (evita servir conteúdo velho).
+
 ## Status dos testes
 
-- 36 testes passando (`pytest tests -q` com Tesseract no PATH)
+- 42 testes passando (`pytest tests -q` com Tesseract no PATH)
 
 ## Como restaurar
 

@@ -7,9 +7,10 @@ import subprocess
 import sys
 from pathlib import Path
 
-from fastapi import APIRouter, BackgroundTasks, File, HTTPException, UploadFile
+from fastapi import APIRouter, BackgroundTasks, File, HTTPException, Request, UploadFile
 
 from app.services.cleanup import cleanup_expired, cleanup_job
+from app.services.concurrency import JobTracker
 from app.services.detector import detect_format
 from app.services.storage import create_job_dir, sanitize_filename
 from app.services.validator import (
@@ -101,7 +102,13 @@ async def _run_conversion(source: Path) -> dict:
     return json.loads(result_json.read_text(encoding="utf-8"))
 
 
-async def _convert_background(job_dir: Path, source: Path, md_name: str) -> None:
+async def _convert_background(
+    job_dir: Path,
+    source: Path,
+    md_name: str,
+    client_ip: str,
+    tracker: JobTracker,
+) -> None:
     """Executa a conversão em segundo plano e atualiza o status do job."""
     try:
         data = await _run_conversion(source)
@@ -111,6 +118,8 @@ async def _convert_background(job_dir: Path, source: Path, md_name: str) -> None
     except Exception:
         _write_status(job_dir, {"status": "error", "detail": "Falha ao converter o arquivo."})
         return
+    finally:
+        tracker.release(client_ip)
 
     (job_dir / md_name).write_text(data["markdown"], encoding="utf-8")
 
@@ -128,45 +137,57 @@ async def _convert_background(job_dir: Path, source: Path, md_name: str) -> None
 
 
 @router.post("/convert")
-async def convert(file: UploadFile = File(...), background_tasks: BackgroundTasks = None):
+async def convert(file: UploadFile = File(...), background_tasks: BackgroundTasks = None, request: Request = None):
     if background_tasks is None:
         background_tasks = BackgroundTasks()
 
-    try:
-        validate_extension(file.filename or "")
-    except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc))
-
-    fmt = detect_format(file.filename)
-    if fmt not in SUPPORTED_FORMATS:
-        raise HTTPException(status_code=400, detail=f"Formato '{fmt}' ainda não é suportado.")
-
-    content = await _read_upload(file)
-
-    cleanup_expired()
-
-    job_dir, task_id = create_job_dir()
-    source = job_dir / f"{task_id}{Path(file.filename).suffix.lower()}"
-    source.write_bytes(content)
+    tracker: JobTracker = request.app.state.job_tracker
+    client_ip = request.client.host if request.client else "unknown"
+    if not tracker.try_acquire(client_ip):
+        raise HTTPException(
+            status_code=429,
+            detail="Servidor ocupado. Aguarde as conversões ativas terminarem e tente novamente.",
+        )
 
     try:
-        validate_content(source, fmt)
-    except ValueError as exc:
-        cleanup_job(job_dir)
-        raise HTTPException(status_code=400, detail=str(exc))
+        try:
+            validate_extension(file.filename or "")
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc))
 
-    _write_status(job_dir, {"status": "processing"})
+        fmt = detect_format(file.filename)
+        if fmt not in SUPPORTED_FORMATS:
+            raise HTTPException(status_code=400, detail=f"Formato '{fmt}' ainda não é suportado.")
 
-    md_name = f"{Path(sanitize_filename(file.filename)).stem}.md"
-    background_tasks.add_task(_convert_background, job_dir, source, md_name)
+        content = await _read_upload(file)
 
-    return {
-        "task_id": task_id,
-        "status": "processing",
-        "filename": md_name,
-        "status_url": f"/api/status/{task_id}",
-        "download_url": f"/api/download/{task_id}",
-    }
+        cleanup_expired()
+
+        job_dir, task_id = create_job_dir()
+        source = job_dir / f"{task_id}{Path(file.filename).suffix.lower()}"
+        source.write_bytes(content)
+
+        try:
+            validate_content(source, fmt)
+        except ValueError as exc:
+            cleanup_job(job_dir)
+            raise HTTPException(status_code=400, detail=str(exc))
+
+        _write_status(job_dir, {"status": "processing"})
+
+        md_name = f"{Path(sanitize_filename(file.filename)).stem}.md"
+        background_tasks.add_task(_convert_background, job_dir, source, md_name, client_ip, tracker)
+
+        return {
+            "task_id": task_id,
+            "status": "processing",
+            "filename": md_name,
+            "status_url": f"/api/status/{task_id}",
+            "download_url": f"/api/download/{task_id}",
+        }
+    except HTTPException:
+        tracker.release(client_ip)
+        raise
 
 
 @router.get("/status/{task_id}")

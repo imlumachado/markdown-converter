@@ -72,7 +72,7 @@ Veja o guia completo em [DEPLOY.md](DEPLOY.md). Resumo:
 | 4 | Publicação | Pausada (testes locais em andamento) |
 | 5 | SEO e conteúdo | Em andamento (blog, sitemap dinâmico, rich snippets) |
 | 6 | Monetização (AdSense) | Em andamento (páginas legais, banner cookies, ads.txt) |
-| 7 | Escalabilidade | Pendente |
+| 7 | Escalabilidade | Em andamento (limite de concorrência, caching HTTP) |
 
 ## Conversão assíncrona e OCR
 

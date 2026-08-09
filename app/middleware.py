@@ -6,6 +6,8 @@ from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoin
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
+STATIC_MAX_AGE = 3600  # 1 hora
+
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
     """Limita requisições por IP usando janela deslizante em memória."""
@@ -32,3 +34,20 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             self._hits[client_ip] = recent
 
         return await call_next(request)
+
+
+class CacheControlMiddleware(BaseHTTPMiddleware):
+    """Define políticas de cache por rota.
+
+    - `/static/*`: cache público de 1 hora (assets versionados raramente mudam).
+    - demais respostas: `no-cache` (revalida sempre, evita servir conteúdo velho).
+    """
+
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
+        response = await call_next(request)
+        path = request.url.path
+        if path.startswith("/static/"):
+            response.headers.setdefault("Cache-Control", f"public, max-age={STATIC_MAX_AGE}")
+        elif response.headers.get("Cache-Control") is None:
+            response.headers["Cache-Control"] = "no-cache"
+        return response
