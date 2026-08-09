@@ -9,6 +9,7 @@ from app.api import download, upload
 from app.config import BASE_URL, GA_ID
 from app.middleware import RateLimitMiddleware
 from app.seo import ROBOTS_TXT, build_sitemap
+from app.services.blog import get_article, load_articles
 
 app = FastAPI(
     title="Markdown Converter",
@@ -30,7 +31,28 @@ async def index(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="index.html",
-        context={"ga_id": GA_ID},
+        context={"ga_id": GA_ID, "base_url": BASE_URL},
+    )
+
+
+@app.get("/blog", response_class=HTMLResponse)
+async def blog_list(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="blog.html",
+        context={"ga_id": GA_ID, "base_url": BASE_URL, "articles": load_articles()},
+    )
+
+
+@app.get("/blog/{slug}", response_class=HTMLResponse)
+async def blog_article(request: Request, slug: str):
+    article = get_article(slug)
+    if article is None:
+        return HTMLResponse("Artigo não encontrado", status_code=404)
+    return templates.TemplateResponse(
+        request=request,
+        name="article.html",
+        context={"ga_id": GA_ID, "base_url": BASE_URL, "article": article},
     )
 
 

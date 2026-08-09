@@ -45,9 +45,19 @@ Backup consolidado do conteúdo criado até o momento. Cada etapa registra o que
 > Nota: a configuração do Render (`render.yaml`) foi removida por enquanto;
 > o foco atual são os testes na máquina local.
 
+## Etapa 5 — SEO e conteúdo (em andamento)
+
+- **Blog de artigos:** conteúdo em Markdown (`content/blog/`), frontmatter
+  (título, descrição, data, categoria), rotas `/blog` e `/blog/{slug}`.
+- **SEO técnico:** `sitemap.xml` dinâmico com artigos + `<lastmod>`, `robots.txt`.
+- **Rich snippets:** Open Graph/Twitter Cards + JSON-LD (`WebApplication`,
+  `FAQPage` na home, `BreadcrumbList` nos artigos).
+- **SEO on-page:** meta description, canônico e h1 por rota.
+- 4 artigos iniciais publicados.
+
 ## Status dos testes
 
-- 23 testes passando (`pytest tests -q` com Tesseract no PATH)
+- 31 testes passando (`pytest tests -q` com Tesseract no PATH)
 
 ## Como restaurar
 

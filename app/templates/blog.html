@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog | Conversor de Arquivos para Markdown</title>
+  <meta name="description" content="Tutoriais e guias para converter Word, Excel, PowerPoint e PDF em Markdown (.md) gratuitamente, com dicas de OCR e boas práticas.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="/blog">
+  {% if ga_id %}
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga_id }}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '{{ ga_id }}');
+  </script>
+  {% endif %}
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/blog.css">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Blog | Conversor de Arquivos para Markdown">
+  <meta property="og:description" content="Tutoriais e guias para converter Word, Excel, PowerPoint e PDF em Markdown gratuitamente.">
+  <meta property="og:url" content="{{ base_url }}/blog">
+  <meta property="og:site_name" content="Markdown Converter">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Blog | Conversor de Arquivos para Markdown">
+  <meta name="twitter:description" content="Tutoriais e guias para converter Word, Excel, PowerPoint e PDF em Markdown gratuitamente.">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">Markdown<span>Converter</span></a>
+      <nav class="main-nav">
+        <a href="/#tool">Ferramenta</a>
+        <a href="/#how-it-works">Como funciona</a>
+        <a href="/#formats">Formatos</a>
+        <a href="/#faq">FAQ</a>
+        <a href="/blog">Blog</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <h1>Blog e <span class="gradient-text">Tutoriais</span></h1>
+        <p class="subtitle">Guias práticos para converter documentos em Markdown, com dicas de OCR e boas práticas.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="blog-grid">
+          {% for article in articles %}
+          <article class="post-card">
+            <span class="post-category">{{ article.category }}</span>
+            <h2><a href="{{ article.url }}">{{ article.title }}</a></h2>
+            <p>{{ article.description }}</p>
+            <time datetime="{{ article.date }}">{{ article.date }}</time>
+          </article>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 Markdown Converter. Todos os direitos reservados.</p>
+      <nav>
+        <a href="/blog">Blog</a>
+        <a href="/privacy">Política de Privacidade</a>
+        <a href="/terms">Termos de Uso</a>
+        <a href="/contact">Contato</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

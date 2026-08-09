@@ -56,6 +56,28 @@ def test_sitemap_xml() -> None:
     assert response.status_code == 200
     assert "urlset" in response.text
     assert "<loc>" in response.text
+    assert "/blog" in response.text
+    assert "<lastmod>" in response.text
+
+
+def test_blog_list() -> None:
+    response = client.get("/blog")
+    assert response.status_code == 200
+    assert "Blog e" in response.text
+    assert "post-card" in response.text
+
+
+def test_blog_article() -> None:
+    response = client.get("/blog/como-converter-word-para-markdown")
+    assert response.status_code == 200
+    assert "Como converter Word para Markdown" in response.text
+    assert "BreadcrumbList" in response.text
+    assert "post-content" in response.text
+
+
+def test_blog_article_not_found() -> None:
+    response = client.get("/blog/artigo-inexistente")
+    assert response.status_code == 404
 
 
 def test_convert_and_download(tmp_path: Path) -> None:

@@ -70,7 +70,7 @@ Veja o guia completo em [DEPLOY.md](DEPLOY.md). Resumo:
 | 2 | Produto HTML/CSS/JS + FastAPI | Concluída |
 | 3 | Segurança e confiabilidade | Concluída |
 | 4 | Publicação | Pausada (testes locais em andamento) |
-| 5 | SEO e conteúdo | Pendente |
+| 5 | SEO e conteúdo | Em andamento (blog, sitemap dinâmico, rich snippets) |
 | 6 | Monetização (AdSense) | Pendente |
 | 7 | Escalabilidade | Pendente |
 
