@@ -67,6 +67,7 @@
   }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" defer></script>
   <script src="/static/js/app.js" defer></script>
 </head>
 <body>
@@ -91,16 +92,18 @@
 
         <div id="tool" class="tool-card">
           <div id="drop-zone" class="drop-zone" role="button" tabindex="0" aria-label="Enviar arquivo">
-            <input type="file" id="file-input" accept=".docx,.xlsx,.pptx,.pdf" hidden>
+            <input type="file" id="file-input" accept=".docx,.xlsx,.pptx,.pdf,.doc,.xls,.ppt,.odt,.ods,.odp" hidden multiple>
             <div class="drop-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path d="M12 16V4m0 0l-4 4m4-4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
                 <path d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3" stroke-linecap="round"/>
               </svg>
             </div>
-            <p class="drop-title">Arraste seu arquivo aqui</p>
-            <p class="drop-hint">ou <span>clique para escolher</span> (DOCX, XLSX, PPTX ou PDF)</p>
+            <p class="drop-title">Arraste um ou mais arquivos aqui</p>
+            <p class="drop-hint">ou <span>clique para escolher</span> (DOCX, XLSX, PPTX, PDF, DOC, XLS, PPT, ODT, ODS, ODP)</p>
           </div>
+
+          <div id="batch-info" class="batch-info" hidden></div>
 
           <div id="progress-wrap" class="progress-wrap" hidden>
             <div class="progress-track"><div id="progress-bar" class="progress-bar"></div></div>
@@ -112,7 +115,11 @@
           <div id="result-box" class="result-box" hidden>
             <div class="result-header">
               <h2>Resultado</h2>
-              <button id="download-btn" class="btn btn-primary" type="button">Baixar .md</button>
+              <div class="result-actions-row">
+                <button id="export-html-btn" class="btn btn-secondary" type="button">Exportar HTML</button>
+                <button id="copy-btn" class="btn btn-secondary" type="button">Copiar</button>
+                <button id="download-btn" class="btn btn-primary" type="button">Baixar .md</button>
+              </div>
             </div>
             <div class="result-body">
               <div id="preview" class="preview"></div>
@@ -178,8 +185,19 @@
         </details>
         <details>
           <summary>Os formatos .doc, .xls e .ppt são suportados?</summary>
-          <p>No momento aceitamos .docx, .xlsx, .pptx e .pdf.</p>
+          <p>Sim. Além de .docx, .xlsx, .pptx e .pdf, agora aceitamos .doc, .xls, .ppt e os formatos abertos .odt, .ods e .odp.</p>
         </details>
+      </div>
+    </section>
+
+    <section id="history" class="section section-alt">
+      <div class="container">
+        <h2>Histórico de conversões</h2>
+        <p class="subtitle">Suas últimas conversões ficam salvas neste navegador. Nada é enviado ao servidor.</p>
+        <div id="history-list" class="history-list"></div>
+        <div class="result-actions">
+          <button id="clear-history-btn" class="btn btn-secondary" type="button">Limpar histórico</button>
+        </div>
       </div>
     </section>
   </main>

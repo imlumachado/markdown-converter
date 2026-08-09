@@ -74,6 +74,15 @@ Veja o guia completo em [DEPLOY.md](DEPLOY.md). Resumo:
 | 6 | Monetização (AdSense) | Em andamento (páginas legais, banner cookies, ads.txt) |
 | 7 | Escalabilidade | Em andamento (limite de concorrência, caching HTTP) |
 
+## Novas funcionalidades
+
+- **Formatos legados:** `.doc`, `.xls`, `.ppt`, `.odt`, `.ods` e `.odp` via
+  LibreOffice headless (requer instalação; `SOFFICE_PATH`).
+- **Copiar:** botão "Copiar" envia o Markdown para a área de transferência.
+- **Histórico:** últimas 20 conversões salvas no navegador (localStorage).
+- **Lote:** arraste vários arquivos e baixe tudo em um ZIP.
+- **Exportar HTML:** gera página HTML a partir do Markdown.
+
 ## Conversão assíncrona e OCR
 
 - **Fluxo assíncrono:** `POST /api/convert` retorna `task_id` e `status_url` na hora; o

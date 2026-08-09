@@ -25,7 +25,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 CONVERSION_TIMEOUT_SECONDS = int(os.getenv("CONVERSION_TIMEOUT_SECONDS", "600"))
 CHUNK_SIZE = 1024 * 1024  # 1 MB
 
-SUPPORTED_FORMATS = frozenset({"docx", "xlsx", "pptx", "pdf"})
+SUPPORTED_FORMATS = frozenset({"docx", "xlsx", "pptx", "pdf", "doc", "xls", "ppt", "odt", "ods", "odp"})
 
 
 async def _read_upload(file: UploadFile) -> bytes:

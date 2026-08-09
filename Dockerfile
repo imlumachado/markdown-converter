@@ -4,13 +4,14 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-por \
+    && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-por libreoffice-core libreoffice-writer libreoffice-calc libreoffice-impress fonts-dejavu \
     && rm -rf /var/lib/apt/lists/* \
     && useradd --create-home --uid 1000 appuser
 
 WORKDIR /app
 
-ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata
+ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata \
+    SOFFICE_PATH=/usr/bin/soffice
 
 COPY --chown=appuser:appuser requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt

@@ -263,10 +263,22 @@ body::before {
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 12px;
+  flex-wrap: wrap;
 }
 
 .result-header h2 {
   font-size: 1.2rem;
+}
+
+.result-actions-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-sm {
+  padding: 8px 14px;
+  font-size: 0.85rem;
 }
 
 .result-body {
@@ -508,6 +520,62 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Batch info */
+.batch-info {
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* History */
+.history-list {
+  max-width: 640px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.history-empty {
+  text-align: center;
+  color: var(--muted);
+}
+
+.history-item {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.history-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.history-info strong {
+  word-break: break-word;
+}
+
+.history-date {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.history-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 @media (min-width: 641px) {

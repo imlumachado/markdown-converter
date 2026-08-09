@@ -188,3 +188,44 @@ def test_reject_empty_file() -> None:
         files={"file": ("vazio.docx", b"", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")},
     )
     assert response.status_code == 400
+
+
+def test_convert_legacy_doc(tmp_path: Path) -> None:
+    """Conversão de .doc via LibreOffice (pula se o LibreOffice não estiver instalado)."""
+    import shutil
+    import subprocess
+
+    from app.services.libreoffice import LibreOfficeUnavailableError, _find_soffice
+
+    try:
+        soffice = _find_soffice()
+    except LibreOfficeUnavailableError:
+        import pytest
+
+        pytest.skip("LibreOffice não instalado")
+
+    source = tmp_path / "api.docx"
+    _make_docx(source)
+    legacy_dir = tmp_path / "legacy"
+    legacy_dir.mkdir(exist_ok=True)
+    subprocess.run(
+        [soffice, "--headless", "--convert-to", "doc", "--outdir", str(legacy_dir), str(source)],
+        check=True,
+        capture_output=True,
+    )
+    legacy = legacy_dir / "api.doc"
+
+    with legacy.open("rb") as f:
+        response = client.post(
+            "/api/convert",
+            files={"file": ("api.doc", f, "application/msword")},
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "processing"
+    assert data["filename"].endswith(".md")
+
+    status = _wait_done(data["task_id"])
+    assert status["status"] == "done"
+    assert "# API Teste" in status["markdown"]

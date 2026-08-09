@@ -73,9 +73,21 @@ Backup consolidado do conteúdo criado até o momento. Cada etapa registra o que
 - **Caching HTTP:** `CacheControlMiddleware` — `/static/*` com `max-age=3600`,
   demais rotas com `no-cache` (evita servir conteúdo velho).
 
+## Novas funcionalidades
+
+- **Formatos legados e OpenDocument:** `.doc`, `.xls`, `.ppt`, `.odt`, `.ods`
+  e `.odp` convertidos via LibreOffice headless (`SOFFICE_PATH`). Detecção por
+  magic bytes (OLE2/ODF) no `magic.py`.
+- **Copiar Markdown:** botão "Copiar" com clipboard API + fallback.
+- **Histórico de conversões:** últimas 20 salvas em `localStorage` (copiar,
+  baixar ou remover por item; botão limpar).
+- **Conversão em lote:** múltiplos arquivos (drag & drop ou seleção) com
+  download em ZIP via JSZip.
+- **Exportar HTML:** gera página HTML a partir do Markdown convertido.
+
 ## Status dos testes
 
-- 42 testes passando (`pytest tests -q` com Tesseract no PATH)
+- 47 testes passando (`pytest tests -q` com Tesseract e LibreOffice no PATH)
 
 ## Como restaurar
 

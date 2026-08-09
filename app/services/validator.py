@@ -8,7 +8,7 @@ from app.services.magic import sniff_format
 MAX_FILE_SIZE: int = 25 * 1024 * 1024  # 25 MB
 
 # Formatos com validação de conteúdo por magic bytes
-CONTENT_CHECKABLE: set[str] = {"docx", "xlsx", "pptx", "pdf"}
+CONTENT_CHECKABLE: set[str] = {"docx", "xlsx", "pptx", "pdf", "doc", "xls", "ppt", "odt", "ods", "odp"}
 
 
 class ValidationError(ValueError):
