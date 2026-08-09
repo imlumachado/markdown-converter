@@ -58,7 +58,6 @@ Testes:
 
 Veja o guia completo em [DEPLOY.md](DEPLOY.md). Resumo:
 
-- **Render:** Blueprint detecta o `render.yaml` (deploy automático por push).
 - **VPS/Docker:** `docker compose up -d --build` (ou `docker build` + `docker run`).
 - Configure `BASE_URL` e `GA_ID` (variáveis de ambiente).
 
@@ -70,9 +69,7 @@ Veja o guia completo em [DEPLOY.md](DEPLOY.md). Resumo:
 | 1 | Motor via Streamlit | Concluída (4 formatos) |
 | 2 | Produto HTML/CSS/JS + FastAPI | Concluída |
 | 3 | Segurança e confiabilidade | Concluída |
-| 4 | Publicação | Em andamento (preparação de deploy pronta) |
-| 3 | Segurança e confiabilidade | Pendente |
-| 4 | Publicação | Pendente |
+| 4 | Publicação | Pausada (testes locais em andamento) |
 | 5 | SEO e conteúdo | Pendente |
 | 6 | Monetização (AdSense) | Pendente |
 | 7 | Escalabilidade | Pendente |

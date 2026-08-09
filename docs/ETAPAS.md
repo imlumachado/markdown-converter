@@ -34,13 +34,16 @@ Backup consolidado do conteúdo criado até o momento. Cada etapa registra o que
 - Leitura do upload em blocos (413 acima do limite)
 - Testes de segurança
 
-## Etapa 4 — Publicação (preparação de deploy concluída)
+## Etapa 4 — Publicação (pausada — testes locais em andamento)
 
 - `config.py` (BASE_URL, GA_ID, PORT via env)
 - `seo.py` + rotas `/robots.txt` e `/sitemap.xml`
 - Google Analytics 4 (opcional via env)
 - `Dockerfile`, `.dockerignore`, `docker-compose.yml`
-- `render.yaml`, `.env.example`, `DEPLOY.md`
+- `.env.example`, `DEPLOY.md`
+
+> Nota: a configuração do Render (`render.yaml`) foi removida por enquanto;
+> o foco atual são os testes na máquina local.
 
 ## Status dos testes
 

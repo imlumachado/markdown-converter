@@ -13,6 +13,5 @@ docs
 README.md
 DEPLOY.md
 docker-compose.yml
-render.yaml
 Dockerfile
 .dockerignore

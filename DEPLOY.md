@@ -7,17 +7,7 @@
   - `BASE_URL` — URL pública (ex.: `https://markdown-converter.com`)
   - `GA_ID` — Measurement ID do Google Analytics 4 (opcional)
 
-## Opção 1 — Render (mais simples)
-
-1. Crie uma conta em https://render.com.
-2. Vá em **New > Blueprint** e conecte o repositório.
-3. O Render detecta o `render.yaml` automaticamente.
-4. Configure `GA_ID` como variável (value or from env) no painel.
-5. Deploy é automático a cada push.
-
-Ajuste o valor de `BASE_URL` no `render.yaml` para o seu domínio final.
-
-## Opção 2 — Docker em VPS (mais controle)
+## Opção 1 — Docker em VPS (mais controle)
 
 ```bash
 # Na máquina
@@ -38,7 +28,7 @@ docker run -d --name markdown-converter \
 
 Para HTTPS, coloque um reverse proxy (Caddy ou Nginx) na frente na porta 443 apontando para `127.0.0.1:8000`.
 
-## Opção 3 — Railway / Fly.io
+## Opção 2 — Railway / Fly.io
 
 - **Railway:** New Project > Deploy from GitHub. Defina `BASE_URL` e `GA_ID` como variáveis.
 - **Fly.io:**
